@@ -28,6 +28,7 @@ angular.module('paperworkNotes').controller('SidebarNotesController',
     
     $scope.getUsers = function (noteId, callback){
       $scope.can_share=false;
+        console.log(typeof $rootScope.i18n);
         if(typeof $rootScope.i18n != "undefined")
 	    $rootScope.umasks=[{'name':$rootScope.i18n.keywords.not_shared, 'value':0},
 		   {'name':$rootScope.i18n.keywords.read_only, 'value':4},
@@ -36,6 +37,8 @@ angular.module('paperworkNotes').controller('SidebarNotesController',
         if(status == 200) {
           $rootScope.users = data.response;
           angular.forEach(data.response,function(user,key){
+            console.log(user['is_current_user']);
+            console.log(user['owner']);
             if (user['is_current_user'] && user['owner']) {
               $scope.can_share=true;
             }
@@ -303,6 +306,7 @@ angular.module('paperworkNotes').controller('SidebarNotesController',
         return false;
       }
       $scope.getUsers(noteId,function(noteId){
+        console.log($scope.can_share);
         if (!$scope.can_share) {
           $rootScope.messageBox({
         'title':   $rootScope.i18n.keywords.cannot_share_title,
