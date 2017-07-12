@@ -33,6 +33,7 @@ angular.module('paperworkNotes').controller('SidebarNotesController',
 	    $rootScope.umasks=[{'name':$rootScope.i18n.keywords.not_shared, 'value':0},
 		   {'name':$rootScope.i18n.keywords.read_only, 'value':4},
 		   {'name':$rootScope.i18n.keywords.read_write, 'value':6}];
+		   console.log($rootScope.umasks);
 	NetService.apiGet('/users/'+noteId, function(status, data) {
         if(status == 200) {
           $rootScope.users = data.response;
