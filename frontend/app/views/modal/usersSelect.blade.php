@@ -16,7 +16,7 @@
 		<div class="user-row">
 		  <i class="fa fa-warning" title="[[Lang::get('keywords.owner_warning')]]" ng-show="(user.owner)"></i>
 		  {{ user.firstname }} {{user.lastname}}
-		  <select id="users_select_umasks" class="perm-select" ng-model="user.umask" ng-options="u.value as (u.name) for u in umasks">
+		  <select class="perm-select users_select_umasks" ng-model="user.umask" ng-options="u.value as (u.name) for u in umasks">
 		  </select>
 		</div>
 	      </div>
