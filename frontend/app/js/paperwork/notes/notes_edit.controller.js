@@ -15,20 +15,48 @@ angular.module('paperworkNotes').controller('NotesEditController',
             return $rootScope.templateNoteEdit.modified;
         };
 
+        /*var rawContent = "";
+        $scope.$watch('templateNoteEdit.content', function(value) {
+            rawContent = $rootScope.templateNoteEdit.content;
+            rawContent = rawContent.replace('<input type="checkbox" disabled>', '[]');
+            rawContent = rawContent.replace('<input type="checkbox" checked disabled>', '[X]');
+            $rootScope.templateNoteEdit.contentEdit = rawContent;
+            console.log(rawContent);        
+        });*/
+        
         var thisController = function (notebookId, noteId, _onChangeFunction) {
             $rootScope.noteSelectedId = {'notebookId': notebookId, 'noteId': noteId};
             $rootScope.versionSelectedId = {'notebookId': notebookId, 'noteId': noteId, 'versionId': 0};
             NotesService.getNoteById(noteId);
             $rootScope.templateNoteEdit = $rootScope.getNoteByIdLocal(noteId);
+            
             if (typeof $rootScope.templateNoteEdit == "undefined" || $rootScope.templateNoteEdit == null) {
                 $rootScope.templateNoteEdit = {};
             }
+            
+            //watch scope
+
 
             if($rootScope.templateNoteEdit.title) {
                 $rootScope.templateNoteEdit.version = {};
                 $rootScope.templateNoteEdit.version.title = $rootScope.templateNoteEdit.title;
                 $rootScope.templateNoteEdit.version.content = $rootScope.templateNoteEdit.content;
+                console.log($rootScope.templateNoteEdit.version.content);
             }
+            
+            console.log($rootScope.templateNoteEdit.version.content);
+            console.log($rootScope.templateNoteEdit);
+            
+            $scope.$watch('templateNoteEdit.version.content', function(value) {
+                var rawContent = $rootScope.templateNoteEdit.version.content;
+                var checkedBox = "<input checked=\"checked\" disabled=\"disabled\" type=\"checkbox\"/>";
+                var uncheckedBox = "<input disabled=\"disabled\" type=\"checkbox\"/>";
+                if (rawContent.indexOf(checkedBox) !== -1 && rawContent.indexOf(uncheckedBox) !== -1) {
+                    rawContent = rawContent.replace(checkedBox, "[X]");
+                    rawContent = rawContent.replace(uncheckedBox, "[]");
+                    $rootScope.templateNoteEdit.version.content = rawContent;
+                }
+            });
 
             NotesService.getNoteVersionAttachments($rootScope.getNotebookSelectedId(), ($rootScope.getNoteSelectedId(true)).noteId, $rootScope.getVersionSelectedId(true).versionId,
                 function (response) {
@@ -40,6 +68,7 @@ angular.module('paperworkNotes').controller('NotesEditController',
                     $('input#tags').tagsinput('add', ($rootScope.templateNoteEdit.tags[i].visibility==1 ? '+':'')+$rootScope.templateNoteEdit.tags[i].title);
                 }
             }
+            alert(1);
 
             $('input#tags').on('beforeItemAdd', function (ev) {
                 // console.log(ev.item);
