@@ -21,8 +21,28 @@ class Version extends PaperworkModel {
 	public function attachments() {
 		return $this->belongsToMany('Attachment')->withTimestamps();
 	}
-	public function user(){
-	  return $this->belongsTo('User');
+
+	public function user() {
+		return $this->belongsTo('User');
+	}
+	
+	/**
+	 * This could be implemented as an extension. Since Paperwork at the
+	 * moment does not support extensions, I am adding as a core feature. 
+	 */
+	public function getContentAttribute($rawValue) {
+		$newValue = "<p>";
+		$lineArray = explode("<p>", $rawValue);
+		for ($i = 0; $i < count($lineArray); $i++) {
+			$pieceArray = explode("<br/>", $lineArray[$i]);
+			$pieceArray[0] = "<p>" . $pieceArray[0];
+			for ($j = 0; $j < count($pieceArray); $j++) {
+				$currentPiece = $pieceArray[$j];
+				$newValue .= preg_replace('/\[(X|x)\](.*)/', '<s>$2</s><br/>', $currentPiece);
+			}
+		}
+		$newValue = preg_replace('/<\/p><\/s>/', '</s></p>', $newValue);
+		return $newValue;
 	}
 }
 
