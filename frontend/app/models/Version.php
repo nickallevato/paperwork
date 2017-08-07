@@ -38,10 +38,12 @@ class Version extends PaperworkModel {
 			$pieceArray[0] = "<p>" . $pieceArray[0];
 			for ($j = 0; $j < count($pieceArray); $j++) {
 				$currentPiece = $pieceArray[$j];
-				$newValue .= preg_replace('/\[(X|x)\](.*)/', '<s>$2</s><br/>', $currentPiece);
+				$newValue .= preg_replace('/\[( |)\](.*)/', '<input type="checkbox" disabled> $2<br/>', $currentPiece);
+				$newValue = preg_replace('/\[(X|x)\](.*)/', '<input type="checkbox" checked disabled> $2<br/>', $newValue);
 			}
 		}
-		$newValue = preg_replace('/<\/p><\/s>/', '</s></p>', $newValue);
+		$newValue = preg_replace('/<br\/>$/', '</p>', $newValue);
+		//exit(var_dump($newValue));
 		return $newValue;
 	}
 }
