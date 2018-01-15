@@ -1,0 +1,66 @@
+- hosts: all
+  become: yes
+  gather_facts: no
+  tasks:   
+    - raw: apt-get update
+    - raw: apt-get -y install python
+
+- hosts: all
+  become: yes
+  gather_facts: no  
+  roles:
+    - geerlingguy.composer
+  pre_tasks:
+    - apt: name={{ item }} update_cache=true
+      with_items:
+        - zip
+        - mysql-server 
+        - php7.0-mysql 
+        - nginx 
+        - php7.0-fpm 
+        - curl 
+        - wget 
+        - git 
+        - php7.0-cli 
+        - php7.0-gd 
+        - php7.0-mcrypt 
+        - php-xml
+        - python-pip
+        - python-mysqldb 
+    #- pip: name=MySQL-python state=latest
+    - wget -qO- https://deb.nodesource.com/setup_8.x | sudo bash -
+    - apt: name=nodejs 
+    - apt: name=npm 
+    - apt: name=nodejs=legacy     
+    - command: npm install npm -g
+    - npm: name=bower global=yes
+    - npm: name=gulp global=yes
+    - command: npm install -g gulp bower gulp-bower
+    - apt: name={{ item }}
+      with_items:
+        - htop     
+  post_tasks:
+    - file: path=/var/www/html/ owner=ubuntu group=ubuntu recurse=true
+    - file: path=/var/www/ owner=ubuntu group=ubuntu recurse=true
+
+    - git: repo=https://github.com/twostairs/paperwork.git dest=/var/www/html/paperwork force=true
+      become: no
+    - composer: command=install working_dir=/var/www/html/paperwork/frontend
+
+    - mysql_db: name=paperwork state=present
+    - mysql_user: name=paperwork password=paperwork priv='*.*:ALL' state=present    
+
+    - command: php artisan migrate --force chdir=/var/www/html/paperwork/frontend
+    - template: src=nginx_conf.site.j2 dest=/etc/nginx/sites-available/default
+    - npm: path=/var/www/html/paperwork/frontend
+    - command: npm install chdir=/var/www/html/paperwork/frontend
+      become: false
+
+    - command: bower install --allow-root chdir=/var/www/html/paperwork/frontend
+      become: false
+
+    - command: gulp chdir=/var/www/html/paperwork/frontend
+      become: false
+
+    - service: name=nginx state=restarted
+    - service: name=php7.0-fpm state=restarted    
